@@ -17,12 +17,8 @@
 # limitations under the License.
 #
 begin
-  include_recipe 'rvm::gem_package'
-  gem_package 'pg' do
-    action :install
-  end
-rescue
   include_recipe 'postgresql::ruby'
+rescue
 end
 
 # Enable secure password generation
