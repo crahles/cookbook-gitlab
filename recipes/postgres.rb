@@ -18,7 +18,7 @@
 #
 begin
   include_recipe 'rvm::gem_package'
-  gem 'pg' do
+  gem_package 'pg' do
     action :install
   end
 rescue
