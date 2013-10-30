@@ -258,7 +258,6 @@ bash "copy gitlab init script" do
     sed -i -e 's/app_root=.*/app_root="#{node['gitlab']['app_home']}"/' /etc/init.d/gitlab
     sed -i -e 's/app_user=.*/app_user="#{node['gitlab']['user']}"/' /etc/init.d/gitlab
     EOH
-  not_if { File.exists?("/etc/init.d/gitlab") }
 end
 
 # Use certificate cookbook for keys
