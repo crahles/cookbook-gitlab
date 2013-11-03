@@ -17,13 +17,7 @@
 # limitations under the License.
 #
 
-include_recipe 'rvm::gem_package'
-gem_package 'pg' do
-  action :install
-end
-chef_gem 'pg' do
-  action :install
-end
+include_recipe 'postgresql::ruby'
 
 # Enable secure password generation
 ::Chef::Recipe.send(:include, Opscode::OpenSSL::Password)
