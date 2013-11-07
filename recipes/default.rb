@@ -255,8 +255,8 @@ bash "copy gitlab init script" do
   cwd "/etc/init.d"
   code <<-EOH
     cp #{node['gitlab']['app_home']}/lib/support/init.d/gitlab /etc/init.d/gitlab
-    sed -i -e 's/app_root=.*/app_root="#{node['gitlab']['app_home']}"/' /etc/init.d/gitlab
-    sed -i -e 's/app_user=.*/app_user="#{node['gitlab']['user']}"/' /etc/init.d/gitlab
+    sed -i -e 's|app_root=.*|app_root="#{node['gitlab']['app_home']}"|' /etc/init.d/gitlab
+    sed -i -e 's|app_user=.*|app_user="#{node['gitlab']['user']}"|' /etc/init.d/gitlab
     EOH
 end
 
