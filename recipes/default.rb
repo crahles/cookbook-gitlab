@@ -232,54 +232,29 @@ end
 
 without_group = node['gitlab']['database']['type'] == 'mysql' ? 'postgres' : 'mysql'
 
-## run with rvm if available otherwise without
-## rvm commands
 # Install Gems with bundle install
-execute "gitlab-bundle-install" do
-  command "source /etc/profile.d/rvm.sh && bundle install --deployment --without development test #{without_group} aws"
+bash "gitlab-bundle-install" do
   cwd node['gitlab']['app_home']
   user node['gitlab']['user']
   group node['gitlab']['group']
-  only_if { 
-    File.exists?("/etc/profile.d/rvm.sh") && 
-    !File.exists?("#{node['gitlab']['app_home']}/vendor/bundle")
-  }
-end
+  code <<-EOH
+    if [ -f /etc/profile.d/rvm.sh ] ; then source /etc/profile.d/rvm.sh; fi
+    bundle install --deployment --without development test #{without_group} aws
+    EOH
+  not_if { File.exists?("#{node['gitlab']['app_home']}/vendor/bundle") }
+end  
+  
 # Initialize database 
-execute "gitlab-bundle-rake" do
-  command "source /etc/profile.d/rvm.sh && bundle exec rake gitlab:setup RAILS_ENV=production force=yes && touch .gitlab-setup"
+bash "gitlab-bundle-rake" do
   cwd node['gitlab']['app_home']
   user node['gitlab']['user']
   group node['gitlab']['group']
-  only_if { 
-    File.exists?("/etc/profile.d/rvm.sh") && 
-    !File.exists?("#{node['gitlab']['app_home']}/.gitlab-setup")
-  }
-end
-
-## non rvm commands
-# Install Gems with bundle install
-execute "gitlab-bundle-install" do
-  command "bundle install --deployment --without development test #{without_group} aws"
-  cwd node['gitlab']['app_home']
-  user node['gitlab']['user']
-  group node['gitlab']['group']
-  only_if { 
-    !File.exists?("/etc/profile.d/rvm.sh") && 
-    !File.exists?("#{node['gitlab']['app_home']}/vendor/bundle")
-  }
-end
-# Initialize database 
-execute "gitlab-bundle-rake" do
-  command "bundle exec rake gitlab:setup RAILS_ENV=production force=yes && touch .gitlab-setup"
-  cwd node['gitlab']['app_home']
-  user node['gitlab']['user']
-  group node['gitlab']['group']
-  only_if { 
-    !File.exists?("/etc/profile.d/rvm.sh") && 
-    !File.exists?("#{node['gitlab']['app_home']}/.gitlab-setup")
-  }
-end
+  code <<-EOH
+    if [ -f /etc/profile.d/rvm.sh ] ; then source /etc/profile.d/rvm.sh; fi
+    bundle exec rake gitlab:setup RAILS_ENV=production force=yes && touch .gitlab-setup
+    EOH
+  not_if { File.exists?("#{node['gitlab']['app_home']}/.gitlab-setup") }
+end  
 
 bash "copy gitlab init script" do
   cwd "/etc/init.d"
