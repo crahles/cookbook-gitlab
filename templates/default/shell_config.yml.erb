@@ -1,11 +1,8 @@
 # GitLab user. git by default
 user: <%= node['gitlab']['user'] %>
 
-# set scheme depending on the https flag
-scheme = node['gitlab']['https'] ? 'https' : 'http'
-
 # Url to gitlab instance. Used for api calls. Should end with a slash.
-gitlab_url: "#{scheme}://<%= @fqdn %>/" 
+gitlab_url: "<%= node['gitlab']['https'] ? 'https' : 'http' %>://<%= @fqdn %>/" 
 
 http_settings:
 #  user: someone
